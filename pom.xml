@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>jru.module3</groupId>
-    <artifactId>jfx-race</artifactId>
+    <artifactId>pjfx-race</artifactId>
     <version>1.0</version>
 
     <properties>
@@ -25,11 +25,6 @@
             <version>18.0.1</version>
         </dependency>
         <dependency>
-            <groupId>org.openjfx</groupId>
-            <artifactId>javafx-graphics</artifactId>
-            <version>18.0.1</version>
-        </dependency>
-        <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>
             <version>5.8.2</version>
@@ -38,65 +33,36 @@
         <dependency>
             <groupId>com.javarush</groupId>
             <artifactId>desktop-game-engine</artifactId>
-            <version>1.0.0</version>
+            <version>1.0</version>
         </dependency>
+
     </dependencies>
 
     <build>
+
+        <resources>
+            <resource>
+                <directory>${project.build.directory}/lib</directory>
+                <targetPath>lib</targetPath>
+            </resource>
+        </resources>
+
         <plugins>
-            <!-- Usual compilation -->
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.10.1</version>
-                <configuration>
-                    <encoding>UTF-8</encoding>
-                </configuration>
-            </plugin>
-            <!-- Run java-fx app over Maven -->
-            <plugin>
-                <groupId>org.openjfx</groupId>
-                <artifactId>javafx-maven-plugin</artifactId>
-                <version>0.0.8</version>
-                <configuration>
-                    <mainClass>com.javarush.games.racer.RacerGame</mainClass>
-                </configuration>
-            </plugin>
-            <!-- Копируем зависимости в target/lib -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <version>3.8.1</version>
-                <executions>
-                    <execution>
-                        <id>copy-dependencies</id>
-                        <phase>process-resources</phase>
-                        <goals>
-                            <goal>copy-dependencies</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>${project.build.directory}/lib</outputDirectory>
-                            <includeScope>compile</includeScope>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
+                <!-- Build an executable JAR -->
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>3.4.2</version>
+                <version>3.4.1</version>
                 <configuration>
-                    <includes>
-                        <include>**/properties/*</include>
-                    </includes>
                     <archive>
                         <manifest>
-                            <mainClass>org.eclipse.jdt.internal.jarinjarloader.JarRsrcLoader</mainClass>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>lib/</classpathPrefix>
+                            <mainClass>org.eclipse.jdt.internal.jarinjarloader.JarRsrcLoader</mainClass>
                         </manifest>
                         <manifestEntries>
                             <Rsrc-Main-Class>com.javarush.games.racer.RacerGame</Rsrc-Main-Class>
+                            <Class-Path>./</Class-Path>
                         </manifestEntries>
                     </archive>
                 </configuration>
@@ -107,31 +73,50 @@
                 <version>3.5.3</version>
                 <configuration>
                     <excludes>
-                        <exclude>**/StrangeTest.java</exclude>
+                        <exclude>StrangeTest.java</exclude>
                     </excludes>
                 </configuration>
             </plugin>
 
+            <!-- Usual compilation -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.10.1</version>
+                <configuration>
+                    <encoding>UTF-8</encoding>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <configuration>
+                    <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                    <excludeTransitive>false</excludeTransitive>
+                    <stripVersion>false</stripVersion>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>copy-dependencies</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- Run java-fx app over Maven -->
+            <plugin>
+                <groupId>org.openjfx</groupId>
+                <artifactId>javafx-maven-plugin</artifactId>
+                <version>0.0.8</version>
+                <configuration>
+                    <mainClass>com.javarush.games.racer.RacerGame</mainClass>
+                </configuration>
+            </plugin>
         </plugins>
-
-<!--        <resources>-->
-<!--            <resource>-->
-<!--                <directory>${project.build.directory}/lib</directory>-->
-<!--                <targetPath>lib</targetPath>-->
-<!--                <includes>-->
-<!--                    <include>*.jar</include>-->
-<!--                </includes>-->
-<!--            </resource>-->
-<!--        </resources>-->
     </build>
-
-    <distributionManagement>
-        <repository>
-            <id>internal.repo</id>
-            <name>Temporary Staging Repository</name>
-            <url>file://${project.build.directory}/lib</url>
-        </repository>
-    </distributionManagement>
-
 
 </project>
